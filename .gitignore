@@ -1,0 +1,12 @@
+# Python
+.venv/
+__pycache__/
+Documents
+
+# Environment
+.env
+GOOGLE_APPLICATION_CREDENTIALS.json
+uv.lock
+Documents
+# Mac
+.DS_Store
