@@ -68,6 +68,17 @@ def fetch_resume(user_id:int):
     except Exception as e:
         raise Exception(str(e))
 
+def fetch_resume_analysis_by_user(user_id:int):
+    try:
+        with get_local_session() as db:
+            resume = db.exec(select(Resume_table).where(Resume_table.user_id == user_id)).first()
+            if not resume:
+                return None
+            analysis = db.exec(select(Resume_analysis_table).where(Resume_analysis_table.resume_id == resume.id)).first()
+            return analysis
+    except Exception as e:
+        raise Exception(str(e))
+
 def fetch_readmap(user_id:int):
     try:
         with get_local_session() as db:
@@ -154,6 +165,22 @@ def fetch_interviews(user_id:int):
     except Exception as e:
         raise Exception(str(e))
     
+def fetch_interview_by_id(interview_id:int):
+    try:
+        with get_local_session() as db:
+            interview = db.exec(select(Interviews_table).where(Interviews_table.id == interview_id)).first()
+            return interview
+    except Exception as e:
+        raise Exception(str(e))
+
+def fetch_interview_report(interview_id:int):
+    try:
+        with get_local_session() as db:
+            report = db.exec(select(final_interview_report).where(final_interview_report.interview_id == interview_id)).first()
+            return report
+    except Exception as e:
+        raise Exception(str(e))
+
 def delete_user_interview(id:int):
     try:
         with get_local_session() as db:
@@ -320,3 +347,4 @@ def update_interview_status(interview_id: int, status: str):
                 db.refresh(interview)
     except Exception as e:
         raise Exception(str(e))
+

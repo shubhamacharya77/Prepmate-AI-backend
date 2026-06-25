@@ -78,5 +78,5 @@ def user_login(request: Request,db:Session=Depends(get_session)):
     f"{FRONTEND_URL}/auth/callback?token={access_token}"
 )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=str(e))
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail=str(e))
 

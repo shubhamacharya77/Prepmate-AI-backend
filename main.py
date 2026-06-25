@@ -9,8 +9,7 @@ from router.job_search import router as job_search
 from router.road_map import router as road_map
 from router.create_interview import router as create_interview
 from router.get_interview_question import router as start_interview
-from router.post_question_answer import router as post_interview_question
-# from test import router as test
+from router.send_answer import router as post_interview_question
 from sqlmodel import SQLModel
 from service.database import engine
 from Interview_Preparation_Agent.agent import checkpointer
@@ -46,12 +45,20 @@ app.include_router(Oauth_router)
 app.include_router(user_delete)
 app.include_router(resume_upload)
 app.include_router(resume_delete)
+from router.get_resume_analysis import router as get_resume_analysis_router
+app.include_router(get_resume_analysis_router)
+from router.get_interview_history import router as get_interview_history_router
+app.include_router(get_interview_history_router)
+from router.get_interview_details import router as get_interview_details_router
+app.include_router(get_interview_details_router)
 app.include_router(job_search)
 app.include_router(road_map)
 app.include_router(create_interview)
 app.include_router(start_interview)
 app.include_router(post_interview_question)
-# app.include_router(test)
+
+from router.get_user_status import router as get_user_status_router
+app.include_router(get_user_status_router)
 @app.get("/",status_code=status.HTTP_200_OK)
 def healthCheck():
     return{

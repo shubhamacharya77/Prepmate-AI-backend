@@ -27,8 +27,10 @@ async def upload_resume(background_tasks:BackgroundTasks, Desired_Position: str 
         uploadResumeDatabase(user["id"],resume_name,supabase_details,raw_resume_text)
 
         # this will invoke the agent and start analysis for the resume 
-        background_tasks.add_task(resume_analysis_store_in_DB,user["id"])
-        background_tasks.add_task(resume_JD_analysis_store_in_DB,user["id"],Desired_Position)
+
+        resume_analysis_store_in_DB(user["id"])
+        resume_JD_analysis_store_in_DB(user["id"], Desired_Position)
+        
         return {
             "message": "resume uploaded!"
         }

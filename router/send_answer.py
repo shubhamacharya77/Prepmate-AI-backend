@@ -6,7 +6,7 @@ from service.request_schema import UserAnswerSchema
 from langgraph.types import Command
 
 router = APIRouter(prefix="/api")
-@router.post("/post_question_answer", tags=["Interview"])
+@router.post("/post_answer", tags=["Interview"])
 def post_answer(answer_payload: UserAnswerSchema, user=Depends(get_current_user)):
     try:
         interview=fetch_active_interview(user["id"])
@@ -18,7 +18,7 @@ def post_answer(answer_payload: UserAnswerSchema, user=Depends(get_current_user)
         config={
             "configurable":{
                 "user_id":user["id"],
-                "thread_id":interview.id
+                "thread_id":str(interview.id)
             }
         }
         copilot_workflow.invoke(Command(resume={"answer": answer_payload.answer}), config=config)

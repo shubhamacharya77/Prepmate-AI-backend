@@ -24,7 +24,7 @@ class Resume_table(SQLModel,table=True):
     resume_path:str=Field(default=None)
     user:Optional["User_table"]=Relationship(back_populates="resume")
     resume_analysis:Optional["Resume_analysis_table"]=Relationship(back_populates="resume")
-    career_roadmap: list["CareerRoadmap_table"] = Relationship(back_populates="resume")
+    career_roadmap: Optional["CareerRoadmap_table"] = Relationship(back_populates="resume")
 
 # what skills user have 
 class Resume_analysis_table(SQLModel,table=True):

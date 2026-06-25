@@ -16,7 +16,7 @@ def start_interview(user=Depends(get_current_user)):
         config={
             "configurable":{
                 "user_id":user["id"],
-                "thread_id":interview.id
+                "thread_id":str(interview.id)
             }
         }
         state_snapshot = copilot_workflow.get_state(config)
@@ -30,11 +30,17 @@ def start_interview(user=Depends(get_current_user)):
                 state_snapshot = copilot_workflow.get_state(config)
                 if state_snapshot.tasks and state_snapshot.tasks[0].interrupts:
                     interrupt_val = state_snapshot.tasks[0].interrupts[0].value
-                    return {"question": interrupt_val.get("question")}
+                    q_data = interrupt_val.get("question", {})
+                    if isinstance(q_data, dict):
+                        return {"question": q_data.get("question"), "question_no": q_data.get("question_no", 1)}
+                    return {"question": q_data, "question_no": 1}
             
             elif "question" in interrupt_val:
                 # We are already at a question interrupt. Just return the question.
-                return {"question": interrupt_val.get("question")}
+                q_data = interrupt_val.get("question", {})
+                if isinstance(q_data, dict):
+                    return {"question": q_data.get("question"), "question_no": q_data.get("question_no", 1)}
+                return {"question": q_data, "question_no": 1}
         
         return {"question": None, "status": "Interview Completed or Error"}
     except HTTPException:

@@ -5,6 +5,8 @@ from prompts.Q_generation_prompt import Q_generation_prompt
 from prompts.report_prompt import report_prompt
 from service.request_schema import FinalInterviewReportSchema,QListSchema
 from langgraph.types import interrupt
+
+
 def fetch_context(state:agnetstate):
     try:
         #fetch resume details
@@ -20,11 +22,13 @@ def fetch_context(state:agnetstate):
     except Exception as e:
         raise Exception(str(e))
 
-
 def generate_questions(state:agnetstate):
     try:
+
         prompt=Q_generation_prompt(state.resume_context,state.interview_type,state.title,state.difficulty_level)
+
         model=primary_llm.with_structured_output(QListSchema)
+
         response=model.invoke(prompt)
         return{
             "generated_questions":[q.model_dump() for q in response.questions]
@@ -48,28 +52,25 @@ def checknode(state:agnetstate):
         raise Exception(str(e))
 
 def get_question(state:agnetstate):
-    try:
-        current_count=state.count
-        questions=state.generated_questions
-        if current_count < len(questions):
-            question = questions[current_count]
-            answer_payload = interrupt({
-                "question": question
-            })
-            
-            full_qa = {
-                "interview_id": state.interview_id,
-                "question": question["question"],
-                "answer": answer_payload["answer"],
-                "interview_type": question["type"]
-            }
-            
-            return {
-                "Q_and_A": full_qa
-            }
-        return {}
-    except Exception as e:
-        raise Exception(str(e))
+    current_count=state.count
+    questions=state.generated_questions
+    if current_count < len(questions):
+        question = questions[current_count]
+        answer_payload = interrupt({
+            "question": question
+        })
+        
+        full_qa = {
+            "interview_id": state.interview_id,
+            "question": question["question"],
+            "answer": answer_payload["answer"],
+            "interview_type": question["type"]
+        }
+        
+        return {
+            "Q_and_A": full_qa
+        }
+    return {}
     
 def store_answer(state:agnetstate):
     try:
