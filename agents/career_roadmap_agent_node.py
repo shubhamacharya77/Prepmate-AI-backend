@@ -6,7 +6,7 @@ from service.models import primary_llm
 from prompts.career_roadmap_prompt import get_roadmap_prompt
 from service.database_schema import ResumeJDAnalysis_table
 from service.database_operations import store_road_map
-
+import logging
 
 def fetch_analysis(state: CareerRoadmapState):
     try:
@@ -39,6 +39,7 @@ def fetch_analysis(state: CareerRoadmapState):
             }
 
     except Exception as e:
+        logging.error(f"Error in fetch_analysis: {e}")
         return {
             "status": "Failure",
             "max_failure": state.max_failure + 1

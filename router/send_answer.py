@@ -4,6 +4,7 @@ from service.database_operations import fetch_active_interview
 from Interview_Preparation_Agent.agent import copilot_workflow
 from service.request_schema import UserAnswerSchema
 from langgraph.types import Command
+import logging
 
 router = APIRouter(prefix="/api")
 @router.post("/post_answer", tags=["Interview"])
@@ -25,5 +26,6 @@ def post_answer(answer_payload: UserAnswerSchema, user=Depends(get_current_user)
         return {"message": "answer submitted"}
     except HTTPException:
         raise
-    except Exception as e: 
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(e))
+    except Exception as e:
+        logging.error("Error posting interview answer", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

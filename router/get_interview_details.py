@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from service.jwt_token import get_current_user
 from service.database_operations import fetch_interview_by_id, fetch_QandAs, fetch_interview_report
+import logging
 
 router = APIRouter(prefix="/api")
 
@@ -54,4 +55,5 @@ def get_interview_details(interview_id: int, user=Depends(get_current_user)):
     except HTTPException:
         raise
     except Exception as e:
+        logging.error("Error getting interview details", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

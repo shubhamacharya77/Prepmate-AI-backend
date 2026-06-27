@@ -1,6 +1,7 @@
 from service.database import get_local_session
 from service.database_schema import Resume_table
 from sqlmodel import select
+import logging
 
 def get_raw_resume_txt_from_DB(user_id) ->dict:
     try:
@@ -19,5 +20,6 @@ def get_raw_resume_txt_from_DB(user_id) ->dict:
             }
 
     except Exception as e:
-        raise Exception(str(e))
+        logging.error("Error getting raw resume text from DB", exc_info=True)
+        raise Exception(str(e)) from e
 

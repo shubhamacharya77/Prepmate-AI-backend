@@ -8,17 +8,16 @@ from typing import Optional
 class User_table(SQLModel,table=True):
     id:int=Field(default=None,primary_key=True)
     name:str=Field(index=True)
-    email:EmailStr=Field(index=True)
+    email:EmailStr=Field(index=True,unique=True)
     resume:Optional["Resume_table"]=Relationship(back_populates="user")
     resumeJDAnalysis:Optional["ResumeJDAnalysis_table"]=Relationship(back_populates="user")
     career_roadmap: Optional["CareerRoadmap_table"] = Relationship(back_populates="user")
     interviews:list["Interviews_table"]=Relationship(back_populates="user")
 
-
 #resume 
 class Resume_table(SQLModel,table=True):
     id:int=Field(default=None,primary_key=True)
-    user_id:int=Field(index=True,foreign_key="user_table.id")
+    user_id:int=Field(index=True,foreign_key="user_table.id",unique=True)
     resume_name:str=Field(index=True)
     resume_raw_txt:str=Field(default=None)
     resume_path:str=Field(default=None)
@@ -29,7 +28,7 @@ class Resume_table(SQLModel,table=True):
 # what skills user have 
 class Resume_analysis_table(SQLModel,table=True):
     id:int=Field(default=None,primary_key=True)
-    resume_id:int=Field(index=True,foreign_key="resume_table.id")
+    resume_id:int=Field(index=True,foreign_key="resume_table.id",unique=True)
     skills:list=Field(sa_column=Column(JSONB))
     experience:list = Field(sa_column=Column(JSONB))
     projects:list = Field(sa_column=Column(JSONB))
@@ -41,8 +40,8 @@ class Resume_analysis_table(SQLModel,table=True):
 # resume v/s JD analysis
 class ResumeJDAnalysis_table(SQLModel, table=True):
     id:int= Field(default=None, primary_key=True)
-    resume_id: int = Field(index=True,foreign_key="resume_table.id")
-    user_id:int=Field(index=True,foreign_key="user_table.id")
+    resume_id: int = Field(index=True,foreign_key="resume_table.id",unique=True)
+    user_id:int=Field(index=True,foreign_key="user_table.id",unique=True)
     match_score: float = Field(default=0.0,le=100,ge=0)
     matched_skills: list[str] = Field(default_factory=list,sa_column=Column(JSONB))
     missing_skills: list[str] = Field(default_factory=list,sa_column=Column(JSONB) )
@@ -65,8 +64,8 @@ class ResumeJDAnalysis_table(SQLModel, table=True):
 # Career Roadmap
 class CareerRoadmap_table(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    resume_id: int = Field(index=True, foreign_key="resume_table.id")
-    user_id: int = Field(index=True, foreign_key="user_table.id")
+    resume_id: int = Field(index=True, foreign_key="resume_table.id",unique=True)
+    user_id: int = Field(index=True, foreign_key="user_table.id",unique=True)
     goal: str = Field(default="")
     roadmap: dict = Field(default_factory=dict, sa_column=Column(JSONB))
     user: Optional["User_table"] = Relationship(back_populates="career_roadmap")
@@ -97,7 +96,7 @@ class QandA(SQLModel,table=True):
 
 class final_interview_report(SQLModel,table=True):
     id:int =Field(default=None,primary_key=True)
-    interview_id: int=Field(foreign_key="interviews_table.id")
+    interview_id: int=Field(foreign_key="interviews_table.id",unique=True)
     strengths:str=Field(default=None)
     weaknesses:str=Field(default=None)
     final_feedback:str=Field(default=None)

@@ -1,6 +1,7 @@
 from fastapi import APIRouter,status,HTTPException,Depends
 from service.jwt_token import get_current_user
 from service.database_operations import delete_user_data, fetch_user
+import logging
 
 router = APIRouter(prefix="/api")
 
@@ -12,4 +13,5 @@ def delete_user(user=Depends(get_current_user)):
         return {"message": "User deleted successfully"}
 
     except Exception as e:
+        logging.error("Error deleting user", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

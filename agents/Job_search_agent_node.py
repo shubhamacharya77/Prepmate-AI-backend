@@ -3,6 +3,8 @@ from service.request_schema import JDAnalysisStructureOutput
 from prompts.JD_analysis import analysis_prompt
 from utils.fetch_jobs import fetch_jobs
 from service.models import primary_llm
+import logging
+
 
 # this will analysis the JD
 def analysis_node(state:JD_analysis_state):
@@ -22,7 +24,8 @@ def analysis_node(state:JD_analysis_state):
         return {
             "status": "MaxRetryExceeded"
         }
-    except Exception:
+    except Exception as e:
+        logging.error(f"Error in analysis_node: {e}", exc_info=True)
         return {
             "status": "Failure",
             "max_failure": state.max_failure + 1
@@ -33,7 +36,7 @@ def analysis_node(state:JD_analysis_state):
 def Job_search(state:JD_analysis_state):
     try:
         if state.max_failure < 3:
-            job_query=f"{state.JD_analysis['job_title']}"
+            job_query=f"{state.JD_analysis.get('job_title', 'Software Engineer')}"
             Jobs=fetch_jobs(job_query)
             return{
              "Job_search":[job.model_dump() for job in Jobs],
@@ -42,7 +45,8 @@ def Job_search(state:JD_analysis_state):
         return {
             "status": "MaxRetryExceeded"
         }
-    except Exception:
+    except Exception as e:
+        logging.error(f"Error in Job_search node: {e}", exc_info=True)
         return {
             "status": "Failure",
             "max_failure": state.max_failure + 1
@@ -56,4 +60,11 @@ def status_check(state: JD_analysis_state):
     if state.status == "MaxRetryExceeded":
         return "end"
 
+    return "fail"
+
+def check_analysis_node(state: JD_analysis_state):
+    if state.status == "Success":
+        return "fetch_jobs"
+    if state.status == "MaxRetryExceeded":
+        return "end"
     return "fail"

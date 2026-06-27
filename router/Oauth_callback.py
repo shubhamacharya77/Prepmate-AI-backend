@@ -8,6 +8,7 @@ from google.oauth2 import id_token
 from sqlmodel import Session,select
 from google.auth.transport import requests as google_requests
 from dotenv import load_dotenv
+import logging
 import os
 load_dotenv()
 router = APIRouter(prefix="/api")
@@ -17,19 +18,25 @@ SCOPES = [
     "https://www.googleapis.com/auth/userinfo.profile",
 ]
 
-OAUTH_SECRET_FILE = os.getenv("OAUTH_SECRET_FILE", "/Users/shubham/Documents/Oauth_secret.json")
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
-
-
 @router.get("/oauth/callback", tags=["User"])
 def user_login(request: Request,db:Session=Depends(get_session)):
     try:
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-        flow = Flow.from_client_secrets_file(
-        OAUTH_SECRET_FILE,
-        scopes=SCOPES
-    )
+        BACKEND_URL = os.getenv("BACKEND_URL", "https://prepmate-ai-backend-424301171233.asia-south1.run.app")
+        FRONTEND_URL = os.getenv("FRONTEND_URL", "https://prepmate-ai-frontend.vercel.app")
+        flow = Flow.from_client_config(
+    {
+        "web": {
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": [
+                f"{BACKEND_URL}/api/oauth/callback"
+            ],    
+        }
+    },
+    scopes=SCOPES,
+)
         flow.redirect_uri = f"{BACKEND_URL}/api/oauth/callback"
         flow.fetch_token(
         authorization_response=str(request.url)
@@ -39,7 +46,7 @@ def user_login(request: Request,db:Session=Depends(get_session)):
         user_info = id_token.verify_oauth2_token(
         credentials.id_token,
         google_requests.Request(),
-        os.getenv("CLIENT_ID"))
+        os.getenv("GOOGLE_CLIENT_ID"))
         Oauth_user={
         "email": user_info["email"],
         "name": user_info["name"],
@@ -66,11 +73,10 @@ def user_login(request: Request,db:Session=Depends(get_session)):
             db.commit()
             db.refresh(new_user)
 
-            user=db.exec(select(User_table).where(User_table.email==Oauth_user["email"])).first()
             payload={
-            "id":user.id,
-            "name":user.name,
-            "email":user.email 
+            "id":new_user.id,
+            "name":new_user.name,
+            "email":new_user.email 
         }
             access_token=create_access_token(payload)
             print(access_token)
@@ -78,5 +84,6 @@ def user_login(request: Request,db:Session=Depends(get_session)):
     f"{FRONTEND_URL}/auth/callback?token={access_token}"
 )
     except Exception as e:
+        logging.error(f"OAuth callback error: {e}")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail=str(e))
 

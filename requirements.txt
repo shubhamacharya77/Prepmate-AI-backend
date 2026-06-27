@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-dotenv
+python-dotenv
 google-auth-oauthlib 
 sqlmodel
 psycopg

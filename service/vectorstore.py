@@ -5,6 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from fastapi import status,HTTPException,UploadFile
 import tempfile
 import traceback
+import logging
 
 
 splitter=RecursiveCharacterTextSplitter(
@@ -38,7 +39,7 @@ async def store_resume_vector(resume:UploadFile,user_id:int):
 
         vectorDB.add_documents(chunks)
     except Exception as e:
-        print(traceback.format_exc())
+        logging.error("Error storing vector", exc_info=True)
         raise
 
 
@@ -49,6 +50,7 @@ def delete_resume_vector(user_id: int):
             where={"user_id": user_id}
         )
         return response
-    except Exception as e :
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(e))
+    except Exception as e:
+        logging.error("Error deleting vector", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     

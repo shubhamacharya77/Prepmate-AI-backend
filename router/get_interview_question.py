@@ -3,6 +3,8 @@ from service.jwt_token import get_current_user
 from service.database_operations import fetch_active_interview
 from Interview_Preparation_Agent.agent import copilot_workflow
 from langgraph.types import Command
+import logging
+
 router = APIRouter(prefix="/api")
 @router.post("/get_interview_questions", tags=["Interview"])
 def start_interview(user=Depends(get_current_user)):
@@ -45,5 +47,6 @@ def start_interview(user=Depends(get_current_user)):
         return {"question": None, "status": "Interview Completed or Error"}
     except HTTPException:
         raise
-    except Exception as e: 
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(e))
+    except Exception as e:
+        logging.error("Error getting interview questions", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

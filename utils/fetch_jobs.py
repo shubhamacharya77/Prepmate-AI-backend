@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 load_dotenv()
 import requests
-import os 
+import os
+import logging
 
 
 class JobOutput(BaseModel):
@@ -43,5 +44,6 @@ def fetch_jobs(query:str):
 )
         return job_outputs
 
-    except Exception as e :
-        raise Exception(str(e))
+    except Exception as e:
+        logging.error("Error fetching jobs from Adzuna", exc_info=True)
+        raise Exception(str(e)) from e

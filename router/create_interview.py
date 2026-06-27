@@ -3,6 +3,7 @@ from service.jwt_token import get_current_user
 from service.request_schema import Interview_details_schema
 from service.database_operations import create_interview_in_db, fetch_active_interview
 from Interview_Preparation_Agent.agent import copilot_workflow
+import logging
 
 router = APIRouter(prefix="/api")
 
@@ -45,3 +46,6 @@ def create_interview(interview_details:Interview_details_schema,user=Depends(get
         }
     except HTTPException:
         raise
+    except Exception as e:
+        logging.error("Error creating interview", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

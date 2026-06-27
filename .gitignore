@@ -6,6 +6,7 @@ Documents
 # Environment
 .env
 GOOGLE_APPLICATION_CREDENTIALS.json
+Oauth_secret.json
 uv.lock
 Documents
 # Mac

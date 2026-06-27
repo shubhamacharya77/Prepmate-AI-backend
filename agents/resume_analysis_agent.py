@@ -3,6 +3,8 @@ from agents.resume_analysis_agent_state import Resume_analysis_state
 from agents.resume_analysis_agent_node import *
 from service.database_operations import store_resume_analysis
 from sqlmodel import select
+import logging
+
 graph=StateGraph(Resume_analysis_state)
 
 # graphs node
@@ -22,8 +24,12 @@ analysis_workflow=graph.compile()
 
 def resume_analysis_store_in_DB(user_id:int):
     try:
-        print("Background task started")
+        logging.info("Resume analysis background task started")
         analysis=analysis_workflow.invoke({"user_id":user_id})
+        
+        if analysis.get("status") != "Success":
+            raise Exception(f"Resume analysis workflow failed. Status: {analysis.get('status')}")
+            
         data={
                 "resume_id":analysis["resume_id"],
                 "skills":analysis["Resume_analysis"]["skills"],
@@ -33,6 +39,7 @@ def resume_analysis_store_in_DB(user_id:int):
                 "summary":analysis["Resume_analysis"]["resume_detailed_summary"]
         }
         store_resume_analysis(data)
-        print("Task complted")
-    except Exception as e :
-        raise Exception(str(e))
+        logging.info("Resume analysis task completed")
+    except Exception as e:
+        logging.error("Failed in resume_analysis_store_in_DB", exc_info=True)
+        raise Exception(f"resume_analysis_store_in_DB failed: {str(e)}") from e

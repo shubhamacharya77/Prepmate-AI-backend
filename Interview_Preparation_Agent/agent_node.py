@@ -5,6 +5,8 @@ from prompts.Q_generation_prompt import Q_generation_prompt
 from prompts.report_prompt import report_prompt
 from service.request_schema import FinalInterviewReportSchema,QListSchema
 from langgraph.types import interrupt
+import logging
+
 
 
 def fetch_context(state:agnetstate):
@@ -20,7 +22,8 @@ def fetch_context(state:agnetstate):
                 "resume_context":None
             }
     except Exception as e:
-        raise Exception(str(e))
+        logging.error("Failed in fetch_context", exc_info=True)
+        raise
 
 def generate_questions(state:agnetstate):
     try:
@@ -34,7 +37,8 @@ def generate_questions(state:agnetstate):
             "generated_questions":[q.model_dump() for q in response.questions]
         }
     except Exception as e:
-        raise Exception(str(e))
+        logging.error("Failed in generate_questions", exc_info=True)
+        raise
     
 def interrupt_node(state:agnetstate):
         interrupt({
@@ -49,7 +53,8 @@ def checknode(state:agnetstate):
         else:
             return "question_node"
     except Exception as e:
-        raise Exception(str(e))
+        logging.error("Failed in checknode", exc_info=True)
+        raise
 
 def get_question(state:agnetstate):
     current_count=state.count
@@ -62,9 +67,9 @@ def get_question(state:agnetstate):
         
         full_qa = {
             "interview_id": state.interview_id,
-            "question": question["question"],
-            "answer": answer_payload["answer"],
-            "interview_type": question["type"]
+            "question": question.get("question", ""),
+            "answer": answer_payload.get("answer", ""),
+            "interview_type": question.get("type", state.interview_type)
         }
         
         return {
@@ -79,7 +84,8 @@ def store_answer(state:agnetstate):
             "count":state.count+1
         }
     except Exception as e:
-        raise Exception(str(e))
+        logging.error("Failed in store_answer", exc_info=True)
+        raise
 
 def report_node(state:agnetstate):
     try:
@@ -99,4 +105,5 @@ def report_node(state:agnetstate):
             "report":report
         }
     except Exception as e:
-        raise Exception(str(e))
+        logging.error("Failed in report_node", exc_info=True)
+        raise

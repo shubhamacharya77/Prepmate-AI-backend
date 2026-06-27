@@ -5,6 +5,8 @@ from sqlmodel import select
 from service.models import primary_llm
 from prompts.resume_JD_analysis_prompt import report_prompt
 from service.database_schema import Resume_table, Resume_analysis_table
+import logging
+
 
 # fetch the resume and it's Analysis 
 def fetch_resume(state:Resume_analysis_state):
@@ -43,6 +45,7 @@ def fetch_resume(state:Resume_analysis_state):
             }
 
     except Exception as e:
+        logging.error("Database error in fetch_resume", exc_info=True)
         return {
             "status": "Failure",
             "max_failure": state.max_failure + 1
@@ -69,7 +72,8 @@ def report_node(state: Resume_analysis_state):
         return {
             "status": "MaxRetryExceeded"
         }
-    except Exception:
+    except Exception as e:
+        logging.error("Error in report_node", exc_info=True)
         return {
             "status": "Failure",
             "max_failure": state.max_failure + 1

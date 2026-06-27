@@ -1,3 +1,4 @@
+import logging
 from service.database import get_local_session
 from fastapi import HTTPException,status,Depends
 from service.database_schema import *
@@ -15,6 +16,7 @@ def fetch_user(user_id:int):
             else:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found !")
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 def uploadResumeDatabase(user_id:int,resume_name:str,supabase_details:dict,raw_text:str):
@@ -32,6 +34,7 @@ def uploadResumeDatabase(user_id:int,resume_name:str,supabase_details:dict,raw_t
             db.refresh(resume_DB)
         return resume_DB
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(e))
     
 def deleteResumeDatabase(resume):
@@ -56,6 +59,7 @@ def deleteResumeDatabase(resume):
                 db.delete(db_resume)
                 db.commit()
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 
@@ -66,6 +70,7 @@ def fetch_resume(user_id:int):
             resume=db.exec(select(Resume_table).where(Resume_table.user_id==user_id)).first()
             return resume
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def fetch_resume_analysis_by_user(user_id:int):
@@ -77,6 +82,7 @@ def fetch_resume_analysis_by_user(user_id:int):
             analysis = db.exec(select(Resume_analysis_table).where(Resume_analysis_table.resume_id == resume.id)).first()
             return analysis
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def fetch_readmap(user_id:int):
@@ -88,6 +94,7 @@ def fetch_readmap(user_id:int):
             else:
                 return None
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 def store_road_map(data:dict):
@@ -103,6 +110,7 @@ def store_road_map(data:dict):
                 DB.commit()
                 DB.refresh(roadmap_record)
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 
@@ -121,6 +129,7 @@ def store_resume_analysis(data):
             DB.commit()
             DB.refresh(analysis_record)
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 def store_resume_report(data):
@@ -151,6 +160,7 @@ def store_resume_report(data):
             DB.refresh(analysis_record)
         
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def fetch_interviews(user_id:int):
@@ -163,6 +173,7 @@ def fetch_interviews(user_id:int):
                 return None
             
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 def fetch_interview_by_id(interview_id:int):
@@ -171,6 +182,7 @@ def fetch_interview_by_id(interview_id:int):
             interview = db.exec(select(Interviews_table).where(Interviews_table.id == interview_id)).first()
             return interview
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def fetch_interview_report(interview_id:int):
@@ -179,6 +191,7 @@ def fetch_interview_report(interview_id:int):
             report = db.exec(select(final_interview_report).where(final_interview_report.interview_id == interview_id)).first()
             return report
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def delete_user_interview(id:int):
@@ -189,6 +202,7 @@ def delete_user_interview(id:int):
                 db.delete(interview)
                 db.commit()
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 def delete_user_interview_history(interview_id:int):
@@ -204,6 +218,7 @@ def delete_user_interview_history(interview_id:int):
 
             db.commit()
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def delete_resume_report(user_id:int):
@@ -215,6 +230,7 @@ def delete_resume_report(user_id:int):
                 db.delete(report)
                 db.commit()
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 
@@ -259,6 +275,7 @@ def delete_user_data(user_id:int):
             db.delete(user)
             db.commit()
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 
@@ -269,6 +286,7 @@ def delete_user_in_db(user_id:int):
             db.delete(user)
             db.commit()
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 
@@ -287,6 +305,7 @@ def create_interview_in_db(data:dict):
             db.refresh(new_interview)
             return new_interview.id
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 def fetch_active_interview(user_id:int):
@@ -295,6 +314,7 @@ def fetch_active_interview(user_id:int):
             Interview=db.exec(select(Interviews_table).where(Interviews_table.user_id == user_id,Interviews_table.status =="Start")).first()
             return Interview
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def store_Q_and_A_in_db(data:dict):
@@ -310,6 +330,7 @@ def store_Q_and_A_in_db(data:dict):
             db.commit()
             db.refresh(new_QandA)
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
     
 def fetch_QandAs(interview_id:int):
@@ -318,6 +339,7 @@ def fetch_QandAs(interview_id:int):
             QandAs=db.exec(select(QandA).where(QandA.interview_id == interview_id)).all()
             return QandAs
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def store_report_in_db(data:dict):
@@ -334,6 +356,7 @@ def store_report_in_db(data:dict):
             db.commit()
             db.refresh(report)
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 
 def update_interview_status(interview_id: int, status: str):
@@ -346,5 +369,6 @@ def update_interview_status(interview_id: int, status: str):
                 db.commit()
                 db.refresh(interview)
     except Exception as e:
+        logging.error("Database operation failed", exc_info=True)
         raise Exception(str(e))
 

@@ -1,6 +1,7 @@
 from langgraph.graph import StateGraph, START, END
 from agents.career_roadmap_agent_state import CareerRoadmapState
 from agents.career_roadmap_agent_node import *
+import logging
 
 graph = StateGraph(CareerRoadmapState)
 
@@ -20,7 +21,7 @@ roadmap_workflow = graph.compile()
 
 def generate_career_roadmap(user_id: int, resume_id: int):
     try:
-        print("Career Roadmap Generation started")
+        logging.info("Career Roadmap Generation started")
         
         # Invoke workflow
         state_output = roadmap_workflow.invoke({
@@ -28,11 +29,12 @@ def generate_career_roadmap(user_id: int, resume_id: int):
             "resume_id": resume_id
         })
         
-        print("Workflow Output Status:", state_output.get("status"))
+        logging.info(f"Workflow Output Status: {state_output.get('status')}")
         
         if state_output.get("status") != "Success":
             raise Exception(f"Roadmap workflow failed. Final status: {state_output.get('status')}")
             
         return state_output.get("roadmap")
     except Exception as e:
-        raise Exception(f"Failed to generate roadmap: {str(e)}")
+        logging.error("Failed to generate roadmap", exc_info=True)
+        raise Exception(f"Failed to generate roadmap: {str(e)}") from e

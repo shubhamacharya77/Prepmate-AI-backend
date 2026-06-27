@@ -3,6 +3,7 @@ from fastapi import HTTPException,status,UploadFile
 from dotenv import load_dotenv
 load_dotenv()
 import os
+import logging
 
 supabase = create_client(
     os.getenv("SUPABASE_URL"),
@@ -25,10 +26,11 @@ async def uploadResumeSupabase(resume:UploadFile,user_id:int):
     })
         return {"storage":response }
     except Exception as e:
+        logging.error("Error uploading to Supabase", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
-            )
+        )
 
 
 def delete_resume_supabase(path: str):
@@ -36,6 +38,7 @@ def delete_resume_supabase(path: str):
         response = supabase.storage.from_("resume").remove([path])
         return {"delete_response": response}
     except Exception as e:
+        logging.error("Error deleting from Supabase", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

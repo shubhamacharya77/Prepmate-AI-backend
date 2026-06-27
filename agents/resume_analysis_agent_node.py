@@ -3,6 +3,8 @@ from utils.get_resume_txt_DB import get_raw_resume_txt_from_DB
 from service.request_schema import ResumeAnalysisStructureOutput
 from prompts.resume_analysis import analysis_prompt
 from service.models import primary_llm
+import logging
+
 
 
 def get_resume(state:Resume_analysis_state):
@@ -14,7 +16,8 @@ def get_resume(state:Resume_analysis_state):
             "resume_raw_text":resume["text"]
         }
     except Exception as e:
-        raise Exception(str(e))
+        logging.error("Failed to get resume from DB", exc_info=True)
+        raise
 
 def analysis_node(state: Resume_analysis_state):
     try:
@@ -41,7 +44,8 @@ def analysis_node(state: Resume_analysis_state):
             "status": "MaxRetryExceeded"
         }
 
-    except Exception:
+    except Exception as e:
+        logging.error("Error in analysis_node", exc_info=True)
         return {
             "status": "Failure",
             "max_failure": state.max_failure + 1

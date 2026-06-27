@@ -2,6 +2,7 @@ from fastapi import APIRouter,status,HTTPException,Depends
 from agents.career_roadmap_agent import generate_career_roadmap
 from service.jwt_token import get_current_user
 from service.database_operations import fetch_readmap,fetch_resume
+import logging
 
 router = APIRouter(prefix="/api")
 
@@ -22,5 +23,6 @@ def road_map(user=Depends(get_current_user)):
             return generated
     except HTTPException:
         raise
-    except Exception as e: 
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(e))
+    except Exception as e:
+        logging.error("Error fetching or generating roadmap", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

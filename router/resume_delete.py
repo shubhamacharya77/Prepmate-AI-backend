@@ -6,8 +6,9 @@ from service.supabase_init import delete_resume_supabase
 from service.vectorstore import delete_resume_vector
 from service.jwt_token import get_current_user
 from service.database_operations import deleteResumeDatabase
+import logging
+
 router= APIRouter(prefix="/api")
-    
 
 @router.delete("/delete_resume",tags=["Resume"])
 def upload_delete(user=Depends(get_current_user),db: Session = Depends(get_session)):
@@ -32,7 +33,10 @@ def upload_delete(user=Depends(get_current_user),db: Session = Depends(get_sessi
             "message": "resume deleted!",
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
+        logging.error("Error deleting resume", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from service.jwt_token import get_current_user
 from service.database_operations import fetch_resume_analysis_by_user
+import logging
 
 router = APIRouter(prefix="/api")
 
@@ -24,4 +25,5 @@ def get_resume_analysis(user=Depends(get_current_user)):
     except HTTPException:
         raise
     except Exception as e:
+        logging.error("Error getting resume analysis", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

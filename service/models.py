@@ -1,10 +1,13 @@
 from langchain_google_vertexai import ChatVertexAI,VertexAIEmbeddings
-from google import genai
+import vertexai
 from dotenv import load_dotenv
-import os
 load_dotenv()
 import os
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "GOOGLE_APPLICATION_CREDENTIALS.json" # Vertex AI credentials JSON 
+
+vertexai.init(
+    project="gemini-model-499618",
+    location="asia-south1"
+)
 primary_llm= ChatVertexAI(
     model=os.getenv("primary_chat_llm"),
     project="gemini-model-499618",
@@ -23,18 +26,3 @@ embedding_model= VertexAIEmbeddings(
     project="gemini-model-499618",
     location="us-central1",
 )
-
-# with open("audio.wav", "rb") as f:
-#     audio_bytes = f.read()
-
-# response = client.models.generate_content(
-#     model="gemini-2.5-flash",
-#     contents=[
-#         {
-#             "mime_type": "audio/wav",
-#             "data": audio_bytes,
-#         },
-#         "Transcribe this audio."
-#     ]
-# )
-
