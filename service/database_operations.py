@@ -48,7 +48,7 @@ def deleteResumeDatabase(resume):
                 if analysis:
                     db.delete(analysis)
 
-                roadmap = db.exec(select(CareerRoadmap_table).where(CareerRoadmap_table.user_id == db_resume.user_id)).first()
+                roadmap = db.exec(select(Career_Roadmap_table).where(Career_Roadmap_table.user_id == db_resume.user_id)).first()
                 if roadmap:
                     db.delete(roadmap)
 
@@ -88,7 +88,7 @@ def fetch_resume_analysis_by_user(user_id:int):
 def fetch_readmap(user_id:int):
     try:
         with get_local_session() as db:
-            roadmap=db.exec(select(CareerRoadmap_table).where(CareerRoadmap_table.user_id==user_id)).first()
+            roadmap=db.exec(select(Career_Roadmap_table).where(Career_Roadmap_table.user_id==user_id)).first()
             if roadmap :
                 return roadmap
             else:
@@ -100,7 +100,7 @@ def fetch_readmap(user_id:int):
 def store_road_map(data:dict):
     try:
         with get_local_session() as DB:
-                roadmap_record = CareerRoadmap_table(
+                roadmap_record = Career_Roadmap_table(
                     resume_id=data["resume_id"],
                     user_id=data["user_id"],
                     goal=data["roadmap"]["goal"],
@@ -247,7 +247,7 @@ def delete_user_data(user_id:int):
                 if analysis:
                     db.delete(analysis)
 
-                roadmap = db.exec(select(CareerRoadmap_table).where(CareerRoadmap_table.user_id == user_id)).first()
+                roadmap = db.exec(select(Career_Roadmap_table).where(Career_Roadmap_table.user_id == user_id)).first()
                 if roadmap:
                     db.delete(roadmap)
 

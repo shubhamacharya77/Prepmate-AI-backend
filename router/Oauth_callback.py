@@ -21,8 +21,6 @@ SCOPES = [
 @router.get("/oauth/callback", tags=["User"])
 def user_login(request: Request,db:Session=Depends(get_session)):
     try:
-        BACKEND_URL = os.getenv("BACKEND_URL", "https://prepmate-ai-backend-424301171233.asia-south1.run.app")
-        FRONTEND_URL = os.getenv("FRONTEND_URL", "https://prepmate-ai-frontend.vercel.app")
         flow = Flow.from_client_config(
     {
         "web": {
@@ -31,13 +29,13 @@ def user_login(request: Request,db:Session=Depends(get_session)):
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
             "redirect_uris": [
-                f"{BACKEND_URL}/api/oauth/callback"
-            ],    
+                f"https://prepmate-ai-backend-424301171233.asia-south1.run.app/api/oauth/callback"
+            ],   
         }
     },
     scopes=SCOPES,
 )
-        flow.redirect_uri = f"{BACKEND_URL}/api/oauth/callback"
+        flow.redirect_uri = f"https://prepmate-ai-backend-424301171233.asia-south1.run.app/api/oauth/callback"
         flow.fetch_token(
         authorization_response=str(request.url)
     )
@@ -60,9 +58,8 @@ def user_login(request: Request,db:Session=Depends(get_session)):
             "email":user.email 
         }
             access_token=create_access_token(payload)
-            print(access_token)
             return RedirectResponse(
-    f"{FRONTEND_URL}/auth/callback?token={access_token}"
+    f"https://prepmate-ai-frontend.vercel.app/auth/callback?token={access_token}"
 )
         else:
             new_user=User_table(
@@ -79,9 +76,8 @@ def user_login(request: Request,db:Session=Depends(get_session)):
             "email":new_user.email 
         }
             access_token=create_access_token(payload)
-            print(access_token)
             return RedirectResponse(
-    f"{FRONTEND_URL}/auth/callback?token={access_token}"
+    f"https://prepmate-ai-frontend.vercel.app/auth/callback?token={access_token}"
 )
     except Exception as e:
         logging.error(f"OAuth callback error: {e}")

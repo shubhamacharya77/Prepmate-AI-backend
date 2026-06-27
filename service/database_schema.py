@@ -11,7 +11,7 @@ class User_table(SQLModel,table=True):
     email:EmailStr=Field(index=True,unique=True)
     resume:Optional["Resume_table"]=Relationship(back_populates="user")
     resumeJDAnalysis:Optional["ResumeJDAnalysis_table"]=Relationship(back_populates="user")
-    career_roadmap: Optional["CareerRoadmap_table"] = Relationship(back_populates="user")
+    career_roadmap: Optional["Career_Roadmap_table"] = Relationship(back_populates="user")
     interviews:list["Interviews_table"]=Relationship(back_populates="user")
 
 #resume 
@@ -23,7 +23,7 @@ class Resume_table(SQLModel,table=True):
     resume_path:str=Field(default=None)
     user:Optional["User_table"]=Relationship(back_populates="resume")
     resume_analysis:Optional["Resume_analysis_table"]=Relationship(back_populates="resume")
-    career_roadmap: Optional["CareerRoadmap_table"] = Relationship(back_populates="resume")
+    career_roadmap: Optional["Career_Roadmap_table"] = Relationship(back_populates="resume")
 
 # what skills user have 
 class Resume_analysis_table(SQLModel,table=True):
@@ -62,7 +62,7 @@ class ResumeJDAnalysis_table(SQLModel, table=True):
 
 
 # Career Roadmap
-class CareerRoadmap_table(SQLModel, table=True):
+class Career_Roadmap_table(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     resume_id: int = Field(index=True, foreign_key="resume_table.id",unique=True)
     user_id: int = Field(index=True, foreign_key="user_table.id",unique=True)

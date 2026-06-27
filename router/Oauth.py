@@ -15,7 +15,6 @@ SCOPES = [
 @router.get("/oauth", tags=["User"])
 def user_oauth():
     try:
-        BACKEND_URL = os.getenv("BACKEND_URL", "https://prepmate-ai-backend-424301171233.asia-south1.run.app")
         flow = Flow.from_client_config(
     {
         "web": {
@@ -24,14 +23,14 @@ def user_oauth():
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
             "redirect_uris": [
-                f"{BACKEND_URL}/api/oauth/callback"
+                f"https://prepmate-ai-backend-424301171233.asia-south1.run.app/api/oauth/callback"
             ],
         }
     },
     scopes=SCOPES,
 )
 
-        flow.redirect_uri = f"{BACKEND_URL}/api/oauth/callback"
+        flow.redirect_uri = f"https://prepmate-ai-backend-424301171233.asia-south1.run.app/api/oauth/callback"
 
         authorization_url, state = flow.authorization_url(
         access_type="offline",

@@ -29,16 +29,12 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 app = FastAPI(title="PrepMate")
-frontend_origins = list(
-    dict.fromkeys(
-        [
-            os.getenv("FRONTEND_URL", "https://prepmate-ai-frontend.vercel.app"),
-        ]
-    )
-)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=frontend_origins,
+    allow_origins=[
+        "https://prepmate-ai-frontend.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
