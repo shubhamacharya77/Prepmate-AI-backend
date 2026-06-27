@@ -151,21 +151,27 @@ graph TD
 Create a `.env` file in the root directory:
 
 ```env
-DATABASE_URL=
+# Application URLs
+BACKEND_URL=http://localhost:8080
+FRONTEND_URL=http://localhost:3000
 
+# Database & Storage (Supabase used as PostgreSQL)
+DATABASE_URL=
+SUPABASE_URL=
+SUPABASE_SERVICE_KEY=
+
+# Google Cloud & Vertex AI
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
+primary_chat_llm=
+secondary_chat_llm=
 
+# Job Search API (Adzuna)
+JOB_SEARCH_API_ID=
+JOB_SEARCH_API_KEY=
+
+# Auth
 JWT_SECRET=
-
-SUPABASE_URL=
-SUPABASE_KEY=
-
-VERTEX_PROJECT_ID=
-VERTEX_LOCATION=
-
-FRONTEND_URL=
-ALLOWED_ORIGIN=
 ```
 
 ---
@@ -180,7 +186,7 @@ ALLOWED_ORIGIN=
 
 2. **Create and activate a virtual environment**
    ```bash
-   python -m venv .venv
+   python3 -m venv .venv
    source .venv/bin/activate
    ```
 
@@ -189,11 +195,14 @@ ALLOWED_ORIGIN=
    pip install -r requirements.txt
    ```
 
-4. **Run the application**
+4. **Setup Google Cloud OAuth**
+   - Ensure you whitelist `http://localhost:8080/api/oauth/callback` under **Authorized redirect URIs** in your Google Cloud Console.
+
+5. **Run the application**
    ```bash
-   uv run uvicorn main:app --reload
+   python3 -m uvicorn main:app --reload --port 8080
    ```
-   *Server runs at: http://localhost:8000*
+   *Server runs at: http://localhost:8080*
 
 ---
 
@@ -202,7 +211,7 @@ ALLOWED_ORIGIN=
 ### Standalone Docker
 ```bash
 docker build -t prepmate-backend .
-docker run -p 8000:8000 prepmate-backend
+docker run -p 8080:8080 prepmate-backend
 ```
 
 ### Docker Compose
@@ -210,13 +219,12 @@ docker run -p 8000:8000 prepmate-backend
 docker compose up --build
 ```
 **Services & Ports:**
-- Backend → `8000`
-- PostgreSQL → `5432`
+- Backend → `8080` (Database is managed remotely via Supabase PostgreSQL)
 
 ---
 
 ## 🗄️ Database
-**Primary Database:** PostgreSQL
+**Primary Database:** PostgreSQL (Hosted via Supabase)
 
 Used for managing:
 - Users & Resumes
@@ -224,6 +232,8 @@ Used for managing:
 - Career Roadmaps
 - Interviews, Questions, and Reports
 - **LangGraph Checkpoints**
+
+Note: Supabase is used both for its PostgreSQL database connection and its Storage bucket (for raw resume files).
 
 ---
 
